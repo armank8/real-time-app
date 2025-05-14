@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import Message from "./models/Message.js";
 import { timeStamp } from "console";
 await connectDB();
+import authRoutes from "./routes/auth.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -23,13 +24,17 @@ app.get("/", (req, res) => {
   res.send("Socket.IO server is up and running");
 });
 
+app.use("/api/auth", authRoutes);
+
+
+
 // socket io
 io.on("connection", async (socket) => {
   console.log("A user connected:", socket.id);
 
   // 1. Send previous messages
   const messages = await Message.find().sort({ timeStamp: 1 }).limit(50);
-  socket.emit("load-messages", messages);  // sends to newly connected clients
+  socket.emit("load-messages", messages); // sends to newly connected clients
 
   // 2. Receive new message
   socket.on("chat-message", async (msg) => {
@@ -49,5 +54,6 @@ io.on("connection", async (socket) => {
   });
 });
 
+// PORT & Listening
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
