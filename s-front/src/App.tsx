@@ -1,32 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import socket from './socket';
 
+type ChatMessage = {
+  _id: string;
+  sender: string;
+  content: string;
+  timestamp: string;
+};
+
 const App: React.FC = () => {
   const [message, setMessage] = useState('');
-  const [chat, setChat] = useState<string[]>([]);
+  const [chat, setChat] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
+    socket.on('load-messages',(messages:ChatMessage[])=>{
+      setChat(messages);
+    })
     socket.on('chat-message', (msg) => {
       setChat((prev) => [...prev, msg]);
     });
 
     return () => {
+      socket.off('load-messages');
       socket.off('chat-message');
     };
   }, []);
 
-  // const emitMessage =  debounce((msg:string)=>{
-  //   socket.emit('chat-message',msg);
-  // },300);
-
-  // useEffect(()=>{
-  //   if(message !== ''){
-  //     emitMessage(message);
-  //   }
-  // },[message]);
-
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(message);
     socket.emit('chat-message', message);
     setMessage('');
   };
@@ -43,8 +45,8 @@ const App: React.FC = () => {
         <button type="submit">Send</button>
       </form>
       <div>
-        {chat.map((msg, idx) => (
-          <p key={idx}>{msg}</p>
+        {chat.map((msg) => (
+          <p key={msg._id}>{msg.sender} : { msg.content}</p>
         ))}
       </div>
     </div>

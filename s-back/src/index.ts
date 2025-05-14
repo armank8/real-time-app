@@ -29,7 +29,7 @@ io.on("connection", async (socket) => {
 
   // 1. Send previous messages
   const messages = await Message.find().sort({ timeStamp: 1 }).limit(50);
-  socket.emit("load-message", messages);
+  socket.emit("load-messages", messages);  // sends to newly connected clients
 
   // 2. Receive new message
   socket.on("chat-message", async (msg) => {
@@ -40,9 +40,10 @@ io.on("connection", async (socket) => {
 
     await newMsg.save();
 
-    io.emit("chat-message", msg); // broadcast to all clients // emit entire message object
+    io.emit("chat-message", newMsg); // broadcast to all clients // emit entire message object
   });
 
+  // Triggered when a client disconnects.
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
