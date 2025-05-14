@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import socket from './socket';
-import { debounce } from 'lodash';
 
 const App: React.FC = () => {
   const [message, setMessage] = useState('');
@@ -16,16 +15,15 @@ const App: React.FC = () => {
     };
   }, []);
 
-  const emitMessage = debounce((message:string)=>{
-    socket.emit('chat-message',message);
-  })
+  // const emitMessage =  debounce((msg:string)=>{
+  //   socket.emit('chat-message',msg);
+  // },300);
 
-  useEffect(()=>{
-    if(message !== ''){
-      // socket.emit('chat-message',message);
-      emitMessage(message);
-    }
-  },[message]);
+  // useEffect(()=>{
+  //   if(message !== ''){
+  //     emitMessage(message);
+  //   }
+  // },[message]);
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();

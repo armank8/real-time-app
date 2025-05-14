@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ES2020",
+    "module": "ES2022",            // Or "esnext", "node16", "nodenext"
     "moduleResolution": "node",
+    "lib": ["esnext"],
+     "allowJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

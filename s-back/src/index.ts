@@ -1,34 +1,50 @@
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import cors from 'cors';
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+import connectDB from "./config/db.js";
+import Message from "./models/Message.js";
+import { timeStamp } from "console";
+await connectDB();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // Update this with your frontend URL
-    methods: ['GET', 'POST'],
+    origin: "*", // Update this with your frontend URL
+    methods: ["GET", "POST"],
   },
 });
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Socket.IO server is up and running');
+app.get("/", (req, res) => {
+  res.send("Socket.IO server is up and running");
 });
 
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+// socket io
+io.on("connection", async (socket) => {
+  console.log("A user connected:", socket.id);
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  // 1. Send previous messages
+  const messages = await Message.find().sort({ timeStamp: 1 }).limit(50);
+  socket.emit("load-message", messages);
+
+  // 2. Receive new message
+  socket.on("chat-message", async (msg) => {
+    const newMsg = new Message({
+      sender: "Anonymous", // You’ll replace with actual username later
+      content: msg,
+    });
+
+    await newMsg.save();
+
+    io.emit("chat-message", msg); // broadcast to all clients // emit entire message object
   });
 
-  socket.on('chat-message', (message) => {
-    console.log('Message received:', message);
-    io.emit('chat-message', message); // broadcast to all clients
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 });
 
