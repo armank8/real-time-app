@@ -7,6 +7,7 @@ import Message from "./models/Message.js";
 import { timeStamp } from "console";
 await connectDB();
 import authRoutes from "./routes/auth.js";
+import 'dotenv/config'
 
 const app = express();
 const server = http.createServer(app);
