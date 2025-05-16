@@ -64,7 +64,7 @@ const login = async () => {
     <div>
       <h1>Real-time Chat</h1>
       <form onSubmit={sendMessage}>
-        <input
+        <input type="text" className="input input-success outline-0"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type message..."
