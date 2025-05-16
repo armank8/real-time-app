@@ -7,7 +7,8 @@ import Message from "./models/Message.js";
 import { timeStamp } from "console";
 await connectDB();
 import authRoutes from "./routes/auth.js";
-import 'dotenv/config'
+import "dotenv/config";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const server = http.createServer(app);
@@ -18,6 +19,8 @@ const io = new Server(server, {
   },
 });
 
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+
 app.use(cors());
 app.use(express.json());
 
@@ -27,24 +30,43 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
 
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
+    socket.data.user = user;
+    next();
+  } catch (error) {
+    console.log("Socket auth failed");
+    next(new Error("Authentication error"));
+  }
+});
 
 // socket io
 io.on("connection", async (socket) => {
-  console.log("A user connected:", socket.id);
+  // console.log("A user connected:", socket.id);
+  const user = socket.data.user;
+  console.log(`${user.name} connected`);
 
-  // 1. Send previous messages
+  // 1. Send previous messages / Load messages
   const messages = await Message.find().sort({ timeStamp: 1 }).limit(50);
   socket.emit("load-messages", messages); // sends to newly connected clients
 
-  // 2. Receive new message
-  socket.on("chat-message", async (msg) => {
-    const newMsg = new Message({
-      sender: "Anonymous", // You’ll replace with actual username later
-      content: msg,
+    // Receive + store + broadcast
+  socket.on("chat-message", async (text) => {
+    // const newMsg = new Message({
+    //   sender: "Anonymous", // You’ll replace with actual username later
+    //   content: msg,
+    // });
+
+    const newMsg = await Message.create({
+      sender: user.name,
+      content: text,
     });
 
-    await newMsg.save();
+
+    // await newMsg.save();
 
     io.emit("chat-message", newMsg); // broadcast to all clients // emit entire message object
   });
