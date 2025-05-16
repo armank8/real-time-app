@@ -12,6 +12,11 @@ const App: React.FC = () => {
   const [message, setMessage] = useState('');
   const [chat, setChat] = useState<ChatMessage[]>([]);
 
+  const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+const [name, setName] = useState('');
+const [token, setToken] = useState(localStorage.getItem('token') || '');
+
   useEffect(() => {
     socket.on('load-messages',(messages:ChatMessage[])=>{
       setChat(messages);
@@ -32,6 +37,28 @@ const App: React.FC = () => {
     socket.emit('chat-message', message);
     setMessage('');
   };
+
+  const register = async () => {
+  const res = await fetch('http://localhost:5000/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password }),
+  });
+  const data = await res.json();
+  localStorage.setItem('token', data.token);
+  window.location.reload();
+};
+
+const login = async () => {
+  const res = await fetch('http://localhost:5000/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await res.json();
+  localStorage.setItem('token', data.token);
+  window.location.reload();
+};
 
   return (
     <div>
