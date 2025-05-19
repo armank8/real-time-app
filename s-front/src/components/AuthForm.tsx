@@ -32,7 +32,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
       localStorage.setItem("token", response.data.token);
       onAuthSuccess(response.data.token);
       setServerError("");
-    } catch (err: any) {
+    } catch (err:unknown) {
       setServerError(err.response?.data?.message || "Something went wrong");
     }
   };
