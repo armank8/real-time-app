@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Input from "./Input";
 import Button from "./Button";
+import api from "../api/axios";
 
 interface AuthFormProps {
   onAuthSuccess: (token: string) => void;
@@ -26,9 +27,10 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
   } = useForm<FormValues>();
 
   const onSubmit = async (data: FormValues) => {
+    console.log(data);
     try {
-      const url = isLogin ? "/api/auth/login" : "/api/auth/register";
-      const response = await axios.post(url, data);
+      const url = isLogin ? "auth/login" : "auth/register";
+      const response = await api.post(url, data);
       localStorage.setItem("token", response.data.token);
       onAuthSuccess(response.data.token);
       setServerError("");
