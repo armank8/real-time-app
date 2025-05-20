@@ -1,7 +1,6 @@
 // src/components/AuthForm.tsx
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import Input from "./Input";
 import Button from "./Button";
 import api from "../api/axios";

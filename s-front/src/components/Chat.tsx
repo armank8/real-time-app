@@ -40,7 +40,7 @@ export default function Chat({ token }: ChatProps) {
     }
   }, [token]);
   console.log(sender);
-  console.log(messages);
+  // console.log(messages);
   console.log("nm",newMessage);
 
   // Setup socket connection

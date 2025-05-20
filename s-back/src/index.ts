@@ -67,10 +67,7 @@ io.on("connection", async (socket) => {
 
   // Receive + store + broadcast
   socket.on("chat-message", async (msg) => {
-    // const newMsg = new Message({
-    //   sender: "Anonymous", // You’ll replace with actual username later
-    //   content: msg,
-    // });
+   
 console.log("hell",msg);
     const newMsg = await Message.create({
       sender: user.name,
