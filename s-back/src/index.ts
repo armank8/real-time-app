@@ -31,9 +31,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 
-io.use(async(socket, next) => {
+io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
+    console.log(token);
     if (!token) {
       return next(new Error("Authentication error"));
     }
@@ -47,10 +48,10 @@ io.use(async(socket, next) => {
     const user = await User.findById(decoded.id).select("-password");
     if (!user) return next(new Error("User not found"));
 
-    socket.data.user = user;  // Attach user to socket
+    socket.data.user = user; // Attach user to socket
     next();
   } catch (error) {
-     next(new Error("Unauthorized"));
+    next(new Error("Unauthorized"));
   }
 });
 
@@ -70,10 +71,10 @@ io.on("connection", async (socket) => {
     //   sender: "Anonymous", // You’ll replace with actual username later
     //   content: msg,
     // });
-
+console.log("hell",msg);
     const newMsg = await Message.create({
       sender: user.name,
-      content: msg,
+      content: msg.content,
     });
 
     await newMsg.save();
